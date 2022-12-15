@@ -152,7 +152,7 @@ class _SearchState extends State<Search> {
 
   cat() async {
     var response = await http.get(Uri.parse(
-        "https://etamilnews.com/wp-json/wp/v2/categories"));
+        CATEGORIES_URL));
     print(jsonDecode(response.body));
     // if (response.statusCode == 200) {
       setState(() {

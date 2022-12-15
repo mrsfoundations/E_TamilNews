@@ -1,8 +1,8 @@
 library constants;
 
 // Your wordpress website URL For Eg:http://wordpress.in/
-const String WORDPRESS_URL = "https://etamilnews.com";
-const String CATEGORIES_URL ="https://etamilnews.com/wp-json/wp/v2/categories";
+const String WORDPRESS_URL = "WebSite URL";
+const String CATEGORIES_URL ="WebSite Categories URL";
 // Featured category ID (for Home Screen top section)
 
 // // // Tab 2 page category ID
