@@ -1,20 +1,22 @@
+import 'package:e_tamilnews/models/article.dart';
+import 'package:e_tamilnews/pages/articles.dart';
 import 'package:e_tamilnews/pages/home.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:e_tamilnews/pages/search.dart';
+import 'package:e_tamilnews/pages/settings.dart';
+import 'package:e_tamilnews/pages/single_article.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import '../pages/authentication/email/login.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-// import 'firebase_options.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'firebase_options.dart';
 
-// final auth = FirebaseAuth.instance;
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(
-  //     options: DefaultFirebaseOptions.currentPlatform,);
-  // MobileAds.instance.initialize();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,);
+  MobileAds.instance.initialize();
       runApp(OneSignalScreen());
 }
 class OneSignalScreen extends StatefulWidget {
@@ -25,11 +27,18 @@ class OneSignalScreen extends StatefulWidget {
 }
 
 class _OneSignalScreenState extends State<OneSignalScreen> {
-  // @override
-  // void initState(){
-  //   super.initState();
-  //   initPlateformState();
-  // }
+  @override
+  void initState(){
+    super.initState();
+    initPlateformState();
+    OneSignal.shared.setNotificationOpenedHandler((openedResult){
+    var data = openedResult.notification.additionalData!["Page"].toString();
+    if (data == "Articles"){
+      Navigator.push(context,MaterialPageRoute(builder: (context)=>Settings()));
+    }
+    });
+  }
+  static final String oneSignalAppId="";
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +56,10 @@ class _OneSignalScreenState extends State<OneSignalScreen> {
           backgroundColor: Colors.redAccent),
     );
   }
+  Future<void> initPlateformState()async{
+    OneSignal.shared.setAppId(oneSignalAppId);
+  }
 }
-//   Future<void> initPlateformState()async{
-//     OneSignal.shared.setAppId(oneSignalAppId);
-//   }
 
 
 

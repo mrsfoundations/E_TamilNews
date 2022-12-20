@@ -1,5 +1,5 @@
 library constants;
 // Your wordpress website URL For Eg:http://wordpress.in/
-const String WORDPRESS_URL = "WORDPRESS_URL";
+const String WORDPRESS_URL = "";
 // Your wordpress website URL For Eg:http://wordpress/categories/
-const String CATEGORIES_URL ="CATEGORIES_URL";
+const String CATEGORIES_URL =" ";

@@ -333,12 +333,15 @@ class _ArticlesState extends State<Articles> {
               children:[
                 Container(
                 child: CustomCarouselSlider(
-                  height: 150,
+                  height: 180,
                   items: itemList,
                   showSubBackground: false,
                   width: MediaQuery.of(context).size.width * 9,
                   autoplay: true,
                 )),
+                SizedBox(
+                  height: 35,
+                ),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async {

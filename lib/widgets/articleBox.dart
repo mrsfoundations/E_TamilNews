@@ -31,7 +31,7 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
                         "h2": Style(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontSize: FontSize.em(0.6),
+                          fontSize: FontSize.em(0.7),
                           padding: EdgeInsets.fromLTRB(25, 0, 0, 0),
                         )
                       },
