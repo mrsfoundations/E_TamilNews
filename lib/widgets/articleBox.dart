@@ -8,7 +8,7 @@ import '../models/Article.dart';
 Widget articleBox(BuildContext context, Article article, String heroId) {
   return ConstrainedBox(
     constraints: new BoxConstraints(
-      maxHeight: 80.0,
+      maxHeight: 90.0,
     ),
     child: Stack(
       children: <Widget>[
@@ -22,16 +22,17 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
                 children: <Widget>[
                   Container(
                     child: Html(
-                      data: article.title!.length > 60
+                      data: article.title!.length > 100
                           ? "<h2>" +
-                              article.title!.substring(0, 60) +
+                              article.title!.substring(0, 100) +
                               "...</h2>"
                           : "<h2>" + article.title.toString() + "</h2>",
                       style: {
                         "h2": Style(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontSize: FontSize.em(0.7),
+                          fontSize: FontSize.percent(65),
+                          margin: EdgeInsets.fromLTRB(0,13, 0, 0),
                           padding: EdgeInsets.fromLTRB(25, 0, 0, 0),
                         )
                       },
@@ -49,7 +50,7 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.fromLTRB(139, 50, 0, 3),
+                padding: const EdgeInsets.fromLTRB(139, 49, 0, 3),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Color(0xFFE3E3E3),
@@ -69,7 +70,7 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
           ),
         ),
         Container(
-            padding: const EdgeInsets.fromLTRB(255, 59, 0, 0),
+            padding: const EdgeInsets.fromLTRB(255, 63, 0, 0),
             child: Row(children: <Widget>[
               Icon(
                 Icons.timer,
@@ -91,19 +92,22 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
             },
           ),
         ),
-        SizedBox(
-          height: 80,
-          width: 140,
-          child: Card(
-            elevation: 0,
-            margin: EdgeInsets.all(10),
-            child: Hero(
-              tag: heroId,
-              child: ClipRRect(
-                borderRadius: new BorderRadius.circular(8.0),
-                child: Image.network(
-                  article.image.toString(),
-                  fit: BoxFit.cover,
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: SizedBox(
+            height: 85,
+            width: 140,
+            child: Card(
+              elevation: 0,
+              margin: EdgeInsets.all(10),
+              child: Hero(
+                tag: heroId,
+                child: ClipRRect(
+                  borderRadius: new BorderRadius.circular(8.0),
+                  child: Image.network(
+                    article.image.toString(),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),

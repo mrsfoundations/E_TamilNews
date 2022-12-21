@@ -5,6 +5,7 @@ import 'package:e_tamilnews/pages/settings.dart';
 import 'package:e_tamilnews/pages/single_article.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_carousel_slider/flutter_custom_carousel_slider.dart';
+import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:share/share.dart';
@@ -12,10 +13,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../common/constants.dart';
 import '../models/Article.dart';
 import '../widgets/articleBox.dart';
-import '../widgets/articleBoxFeatured.dart';
-import 'authentication/email/login.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,31 +28,29 @@ class Articles extends StatefulWidget {
 
 class _ArticlesState extends State<Articles> {
   // List<dynamic> featuredArticles = [];
-  List<dynamic> latestArticles = [];
+  Rx<List<dynamic>> latestArticles = Rx([]);
 
-  Future<List<dynamic>>? _futureLastestArticles;
+  Rxn<Future<List<dynamic>>?> _futureLastestArticles = Rxn();
   // Future<List<dynamic>>? _futureFeaturedArticles;
   ScrollController? _controller;
   int page = 1;
   bool _infiniteStop = false;
-  
-
 
   @override
   void initState() {
     super.initState();
     OnRefIndicator(page);
-    _futureLastestArticles = fetchLatestArticles(1);
+    _futureLastestArticles.value = fetchLatestArticles(1);
     // _futureFeaturedArticles = fetchFeaturedArticles(1);
     _controller =
         ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
     _controller!.addListener(_scrollListener);
     _infiniteStop = false;
   }
+
   bool isLoaded = false;
   InterstitialAd? interstitialAd;
   var clickcount = 0;
-
 
   adsInserter(value) {
     if (value.length > 1) {
@@ -70,7 +66,6 @@ class _ArticlesState extends State<Articles> {
     }
   }
 
-
   @override
   void dispose() {
     super.dispose();
@@ -78,23 +73,22 @@ class _ArticlesState extends State<Articles> {
   }
 
   Future<List<dynamic>> fetchLatestArticles(int page) async {
-
     try {
-      var response = await http.get(Uri.parse(
-          '$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed'));
+      var response = await http
+          .get(Uri.parse('$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed'));
       print('$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed');
       if (this.mounted) {
         if (response.statusCode == 200) {
-          latestArticles.addAll(json
+          latestArticles.value.addAll(json
               .decode(response.body)
               .map((m) => Article.fromJson(m))
               .toList());
 
-          if (latestArticles.length % 10 != 0) {
+          if (latestArticles.value.length % 10 != 0) {
             _infiniteStop = true;
           }
-          latestArticles.forEach((item) {
-            itemList.add(
+          latestArticles.value.forEach((item) {
+            itemList.value.add(
               CarouselItem(
                 image: NetworkImage(
                   item.image,
@@ -115,7 +109,7 @@ class _ArticlesState extends State<Articles> {
 
           // print(itemList.length);
           setState(() {});
-          return latestArticles;
+          return latestArticles.value;
         }
         setState(() {
           _infiniteStop = true;
@@ -124,24 +118,26 @@ class _ArticlesState extends State<Articles> {
     } on SocketException {
       throw 'No Internet connection';
     }
-    return latestArticles;
+    return latestArticles.value;
   }
 
   OnRefIndicator(int page) async {
     try {
-      var response = await http.get(Uri.parse(
-          '$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed'));
+      var response = await http
+          .get(Uri.parse('$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed'));
       if (this.mounted) {
         if (response.statusCode == 200) {
-          latestArticles = (json
+          latestArticles.value = (json
               .decode(response.body)
               .map((m) => Article.fromJson(m))
               .toList());
+          print("skjbdskjn");
+          print(latestArticles.value.length);
 
-          if (latestArticles.length % 10 != 0) {
-            _infiniteStop = true;
-          }
-          itemList = latestArticles.map((item) {
+          // if (latestArticles.length % 10 != 0) {
+          //   _infiniteStop = true;
+          // }
+          itemList.value = latestArticles.value.map((item) {
             return CarouselItem(
               image: NetworkImage(
                 item.image,
@@ -151,7 +147,7 @@ class _ArticlesState extends State<Articles> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>  SingleArticle(item, heroId),
+                    builder: (context) => SingleArticle(item, heroId),
                   ),
                 );
                 print(item.link);
@@ -201,41 +197,39 @@ class _ArticlesState extends State<Articles> {
     if (isEnd) {
       setState(() {
         page += 1;
-        _futureLastestArticles = fetchLatestArticles(page);
+        _futureLastestArticles.value = fetchLatestArticles(page);
       });
     }
   }
 
-  List<CarouselItem> itemList = [];
+  Rx<List<CarouselItem>> itemList = Rx([]);
 
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     InterstitialAd.load(
-      adUnitId:"ca-app-pub-3940256099942544/1033173712",
-      request:AdRequest(),
-      adLoadCallback:InterstitialAdLoadCallback(
-        onAdLoaded: (ad){
+      adUnitId: "ca-app-pub-3940256099942544/1033173712",
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
           setState(() {
-            isLoaded=true;
-            this.interstitialAd=ad;
-
+            isLoaded = true;
+            this.interstitialAd = ad;
           });
           print("Ad");
         },
-        onAdFailedToLoad: (error){
+        onAdFailedToLoad: (error) {
           print("Interstitial Ad");
         },
       ),
     );
   }
-  void showInterstitial()async{
+
+  void showInterstitial() async {
     interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (InterstitialAd ad) =>
-          print('Ad Showed'),
-      onAdDismissedFullScreenContent: (InterstitialAd ad) =>
-          ad.dispose(),
+      onAdShowedFullScreenContent: (InterstitialAd ad) => print('Ad Showed'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) => ad.dispose(),
       onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
         Navigator.of(context).pop();
         ad.dispose();
@@ -255,21 +249,108 @@ class _ArticlesState extends State<Articles> {
         backgroundColor: Colors.red,
       ),
       body: Container(
-        decoration: BoxDecoration(color: Colors.white70),
-        child: Column(
-          children: <Widget>[
-            latestPosts(_futureLastestArticles as Future<List<dynamic>>)
-          ],
+          decoration: BoxDecoration(color: Colors.white70),
+          child: Column(
+            children: <Widget>[
+              Obx(
+              ()=> FutureBuilder<List<dynamic>>(
+                  future: _futureLastestArticles.value,
+                  builder: (context, articleSnapshot) {
+                    if (articleSnapshot.hasData) {
+                      print(articleSnapshot.data);
+                      if (articleSnapshot.data!.length == 0) return Container();
+                      return Expanded(
+                        flex: 2,
+                        child: Column(
+                          children: [
+                            Container(
+                                child: CustomCarouselSlider(
+                              height: 180,
+                              items: itemList.value,
+                              showSubBackground: false,
+                              width: MediaQuery.of(context).size.width * 9,
+                              autoplay: true,
+                            )),
+                            SizedBox(
+                              height: 35,
+                            ),
+                            Expanded(
+                              child: RefreshIndicator(
+                                onRefresh: () async {
+                                  // await OnRefIndicator(page);
+                                  _futureLastestArticles.value = fetchLatestArticles(1);
+                                },
+                                child: Builder(builder: (context) {
+                                  // adsInserter(articleSnapshot.data);
+                                  return ListView(
+                                      children: articleSnapshot.data!.map((item) {
+                                    // if (item is BannerAd) {
+                                    //   return Container(
+                                    //     height: 50,
+                                    //     child: AdWidget(
+                                    //       ad: item,
+                                    //     ),
+                                    //   );
+                                    // }
+                                    final heroId = item.id.toString();
+                                    return InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            clickcount = clickcount + 1;
+                                            if (clickcount > 2) {
+                                              showInterstitial();
+                                              clickcount = 0;
+                                            }
+                                          });
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SingleArticle(item, heroId),
+                                            ),
+                                          );
+                                        },
+                                        child: articleBox(context, item, heroId));
+                                  }).toList());
+                                }),
+                              ),
+                            ),
+                            // !_infiniteStop ? Container() : Container()
+                          ],
+                        ),
+                      );
+                    } else if (articleSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(child: CircularProgressIndicator()),
+                        ],
+                      );
+                    } else if (articleSnapshot.hasError) {
+                      return Container();
+                    }
+                    return Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      height: 150,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+
       //Drawer
       drawer: Drawer(
         child: ListView(
           // Important: Remove any padding from the ListView.
           children: <Widget>[
             DrawerHeader(
-              child:Text("Etamilnews",
-                style:TextStyle(fontSize: 25),
+              child: Text(
+                "Etamilnews",
+                style: TextStyle(fontSize: 25),
               ),
               decoration: BoxDecoration(
                 color: Colors.blue,
@@ -284,14 +365,20 @@ class _ArticlesState extends State<Articles> {
               },
             ),
             ListTile(
-              leading:  Image.asset('assets/Whatsapp_icon.png',height: 25,),
+              leading: Image.asset(
+                'assets/Whatsapp_icon.png',
+                height: 25,
+              ),
               title: Text("What's App"),
               onTap: () {
                 launchWhatsapp(number: "+919790055058", message: "Hi");
               },
             ),
             ListTile(
-              leading:  Image.asset('assets/Youtubeicon.png',width: 25,),
+              leading: Image.asset(
+                'assets/Youtubeicon.png',
+                width: 25,
+              ),
               title: Text("Youtube"),
               onTap: () {
                 launchYoutube(
@@ -307,161 +394,93 @@ class _ArticlesState extends State<Articles> {
                     'https://github.com/mrsfoundations/Flutter-for-Wordpress-App');
               },
             ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Logout"),
-              onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              },
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget latestPosts(Future<List<dynamic>> latestArticles) {
-    return FutureBuilder<List<dynamic>>(
-      future: latestArticles,
-      builder: (context, articleSnapshot) {
-        if (articleSnapshot.hasData) {
-          if (articleSnapshot.data!.length == 0) return Container();
-          return Expanded(
-            flex: 2,
-            child: Column(
-              children:[
-                Container(
-                child: CustomCarouselSlider(
-                  height: 180,
-                  items: itemList,
-                  showSubBackground: false,
-                  width: MediaQuery.of(context).size.width * 9,
-                  autoplay: true,
-                )),
-                SizedBox(
-                  height: 35,
-                ),
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () async {
-                    await OnRefIndicator(page);
-                    },
-                    child: Builder(
-                      builder: (context) {
-                        // adsInserter(articleSnapshot.data);
-                        return ListView(
-                            children: articleSnapshot.data!.map((item) {
-                              // if (item is BannerAd) {
-                              //   return Container(
-                              //     height: 50,
-                              //     child: AdWidget(
-                              //       ad: item,
-                              //     ),
-                              //   );
-                              // }
-                              final heroId = item.id.toString();
-                              return InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    // clickcount = clickcount +1 ;
-                                    // if (clickcount > 2) {
-                                    //   showInterstitial();
-                                    //   clickcount = 0;
-                                    // }
-                                  });
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SingleArticle(item, heroId),
-                                    ),
-                                  );
-                                },
-                                child: articleBox(context, item, heroId));
-
-                            }).toList());
-                      }
-                    ),
-                  ),
-                ),
-                !_infiniteStop ? Container() : Container()
-              ],
-            ),
-          );
-        } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(child: CircularProgressIndicator()),
-            ],
-          );
-        } else if (articleSnapshot.hasError) {
-          return Container();
-        }
-        return Container(
-          alignment: Alignment.center,
-          width: MediaQuery.of(context).size.width,
-          height: 150,
-        );
-      },
-    );
-  }
-  // Widget featuredPost(Future<List<dynamic>> featuredArticles) {
-  //   return SingleChildScrollView(
-  //     scrollDirection: Axis.horizontal,
-  //     child: FutureBuilder<List<dynamic>>(
-  //       future: featuredArticles,
-  //       builder: (context, articleSnapshot) {
-  //         if (articleSnapshot.hasData) {
-  //           if (articleSnapshot.data!.length == 0) return Container();
-  //           return Row(
-  //               children: articleSnapshot.data!.map((item) {
-  //                 final heroId = item.id.toString() + "-featured";
-  //                 return InkWell(
-  //                     onTap: () {
-  //                       Navigator.push(
-  //                         context,
-  //                         MaterialPageRoute(
-  //                           builder: (context) => SingleArticle(item, heroId),
-  //                         ),
-  //                       );
-  //                     },
-  //                     child: articleBoxFeatured(context, item, heroId)
-  //                 );
-  //               }).toList());
-  //         } else if (articleSnapshot.hasError) {
-  //            return Container(
-  //           //   alignment: Alignment.center,
-  //           //   margin: EdgeInsets.fromLTRB(0, 60, 0, 0),
-  //           //   width: MediaQuery.of(context).size.width,
-  //           //   height: MediaQuery.of(context).size.height,
-  //           //   child: Column(
-  //           //     children: <Widget>[
-  //           //       Image.asset(
-  //           //         "assets/no-internet.png",
-  //           //         width: 250,
-  //           //       ),
-  //           //       Text("No Internet Connection."),
-  //           //       TextButton.icon(
-  //           //         icon: Icon(Icons.refresh),
-  //           //         label: Text("Reload"),
-  //           //         onPressed: () {
-  //           //           _futureLastestArticles = fetchLatestArticles(1);
-  //           //           _futureFeaturedArticles = fetchFeaturedArticles(1);
-  //           //         },
-  //           //       )
-  //           //     ],
-  //           //   ),
-  //           );
-  //         }
-  //         return Container(
-  //           alignment: Alignment.center,
-  //           width: MediaQuery.of(context).size.width,
-  //           height: 280,
-  //
+  // Widget latestPosts(Future<List<dynamic>> latestArticles) {
+  //   return FutureBuilder<List<dynamic>>(
+  //     future: latestArticles,
+  //     builder: (context, articleSnapshot) {
+  //       if (articleSnapshot.hasData) {
+  //         if (articleSnapshot.data!.length == 0) return Container();
+  //         return Expanded(
+  //           flex: 2,
+  //           child: Column(
+  //             children: [
+  //               Container(
+  //                   child: CustomCarouselSlider(
+  //                 height: 180,
+  //                 items: itemList,
+  //                 showSubBackground: false,
+  //                 width: MediaQuery.of(context).size.width * 9,
+  //                 autoplay: true,
+  //               )),
+  //               SizedBox(
+  //                 height: 35,
+  //               ),
+  //               Expanded(
+  //                 child: RefreshIndicator(
+  //                   onRefresh: () async {
+  //                     await OnRefIndicator(page);
+  //                   },
+  //                   child: Builder(builder: (context) {
+  //                     // adsInserter(articleSnapshot.data);
+  //                     return ListView(
+  //                         children: articleSnapshot.data!.map((item) {
+  //                       // if (item is BannerAd) {
+  //                       //   return Container(
+  //                       //     height: 50,
+  //                       //     child: AdWidget(
+  //                       //       ad: item,
+  //                       //     ),
+  //                       //   );
+  //                       // }
+  //                       final heroId = item.id.toString();
+  //                       return InkWell(
+  //                           onTap: () {
+  //                             setState(() {
+  //                               clickcount = clickcount + 1;
+  //                               if (clickcount > 2) {
+  //                                 showInterstitial();
+  //                                 clickcount = 0;
+  //                               }
+  //                             });
+  //                             Navigator.push(
+  //                               context,
+  //                               MaterialPageRoute(
+  //                                 builder: (context) =>
+  //                                     SingleArticle(item, heroId),
+  //                               ),
+  //                             );
+  //                           },
+  //                           child: articleBox(context, item, heroId));
+  //                     }).toList());
+  //                   }),
+  //                 ),
+  //               ),
+  //               // !_infiniteStop ? Container() : Container()
+  //             ],
+  //           ),
   //         );
-  //       },
-  //     ),
+  //       } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
+  //         return Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             Center(child: CircularProgressIndicator()),
+  //           ],
+  //         );
+  //       } else if (articleSnapshot.hasError) {
+  //         return Container();
+  //       }
+  //       return Container(
+  //         alignment: Alignment.center,
+  //         width: MediaQuery.of(context).size.width,
+  //         height: 150,
+  //       );
+  //     },
   //   );
   // }
 }
@@ -472,8 +491,8 @@ void launchWhatsapp({@required number, @required message}) async {
 }
 
 void launchYoutube({required String Url}) async {
-  var url = Uri.parse(
-      "https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
+  var url =
+      Uri.parse("https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {

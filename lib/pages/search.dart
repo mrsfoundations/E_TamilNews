@@ -269,14 +269,6 @@ class _SearchState extends State<Search> {
                     'https://github.com/mrsfoundations/Flutter-for-Wordpress-App');
               },
             ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Logout"),
-              onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              },
-            ),
           ],
         ),
       ),
