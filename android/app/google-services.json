@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "994796054987",
+    "project_id": "etamilnews-ddf8a",
+    "storage_bucket": "etamilnews-ddf8a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994796054987:android:9ca0a4fd669f750d6c2e4e",
+        "android_client_info": {
+          "package_name": "com.cloudsindia.etamil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "994796054987-l0qtta3vpdbfuc1luidua92opc67lkon.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpVZkX9ERCyb8oeSF4NuoijF52q0se4Hg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "994796054987-l0qtta3vpdbfuc1luidua92opc67lkon.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "994796054987-ogaitc96rp76k4274a3p3p4osdh3krms.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.eTamilnews"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
