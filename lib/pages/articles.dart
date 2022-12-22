@@ -57,7 +57,7 @@ class _ArticlesState extends State<Articles> {
       value.insert(
         value.length - 1,
         BannerAd(
-          adUnitId: "ca-app-pub-3940256099942544/6300978111",
+          adUnitId: "",
           size: AdSize.banner,
           request: AdRequest(),
           listener: BannerAdListener(),
