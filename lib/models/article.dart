@@ -36,9 +36,7 @@ class Article {
   factory Article.fromJson(Map<String, dynamic> json) {
     String content = json['content'] != null ? json['content']['rendered'] : "";
 
-    String image = json["featured_media"] != null
-        ? json["featured_media"]
-        : "https://images.wallpaperscraft.com/image/surface_dark_background_texture_50754_1920x1080.jpg";
+    //String image = json["featured_media"] ?? "https://images.wallpaperscraft.com/image/surface_dark_background_texture_50754_1920x1080.jpg";
     String author = json["yoast_head_json"]["author"];
     String category = json["_embedded"]["wp:term"][0][0]["name"];
     int cat_id = json["_embedded"]["wp:term"][0][0]["id"];
@@ -54,7 +52,7 @@ class Article {
         content: content,
         // embedded: json['embedded'],
       author: author,
-        image: image,
+        image: json['slug'],
          category:category,
         date: date,
         link: json["link"],
