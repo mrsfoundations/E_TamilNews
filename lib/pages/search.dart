@@ -291,7 +291,7 @@ class _SearchState extends State<Search> {
             children: <Widget>[
               Column(
                   children: articleSnapshot.data!.map((item) {
-                final heroId = item.id.toString() + "-searched";
+                final heroId = item.category.toString() + "-searched";
                 return InkWell(
                   onTap: () {
                     setState(() {

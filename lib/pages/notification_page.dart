@@ -13,20 +13,22 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: [
-          Text(
-            'Id:${widget.data['user_id']}',
-          ),
-          SizedBox(height: 5,),
-          Text(
-            'Name:${widget.data['user_name']}',
-          ),
-          SizedBox(height: 5,),
-          Text(
-            'Email:${widget.data['email_id']}',
-          ),
-        ],
+      body: Center(
+        child: Column(
+          children: [
+            Text(
+              'Id:${widget.data['user_id']}',
+            ),
+            SizedBox(height: 5,),
+            Text(
+              'Name:${widget.data['user_name']}',
+            ),
+            SizedBox(height: 5,),
+            Text(
+              'Email:${widget.data['email_id']}',
+            ),
+          ],
+        ),
       ),
     );
   }

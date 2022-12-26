@@ -20,7 +20,7 @@ class _CategoryArticlesState extends State<CategoryArticles> {
   Future<List<dynamic>>? _futureCategoryArticles;
   ScrollController? _controller;
   int page = 1;
-  bool _infiniteStop = false;
+  // bool _infiniteStop = false;
 
   @override
   void initState() {
@@ -28,8 +28,8 @@ class _CategoryArticlesState extends State<CategoryArticles> {
     _futureCategoryArticles = fetchCategoryArticles(1);
     _controller =
         ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
-    _controller!.addListener(_scrollListener);
-    _infiniteStop = false;
+    // _controller!.addListener(_scrollListener);
+    // _infiniteStop = false;
   }
 
   @override
@@ -50,16 +50,16 @@ class _CategoryArticlesState extends State<CategoryArticles> {
                 .decode(response.body)
                 .map((m) => Article.fromJson(m))
                 .toList());
-            if (categoryArticles.length % 10 != 0) {
-              _infiniteStop = true;
-            }
+            // if (categoryArticles.length % 10 != 0) {
+            //   // _infiniteStop = true;
+            // }
           });
 
           return categoryArticles;
         }
-        setState(() {
-          _infiniteStop = true;
-        });
+        // setState(() {
+        //   _infiniteStop = true;
+        // });
       }
     } on SocketException {
       throw 'No Internet connection';
@@ -67,16 +67,16 @@ class _CategoryArticlesState extends State<CategoryArticles> {
     return categoryArticles;
   }
 
-  _scrollListener() {
-    var isEnd = _controller!.offset >= _controller!.position.maxScrollExtent &&
-        !_controller!.position.outOfRange;
-    if (isEnd) {
-      setState(() {
-        page += 1;
-        _futureCategoryArticles = fetchCategoryArticles(page);
-      });
-    }
-  }
+  // _scrollListener() {
+  //   var isEnd = _controller!.offset >= _controller!.position.maxScrollExtent &&
+  //       !_controller!.position.outOfRange;
+  //   if (isEnd) {
+  //     setState(() {
+  //       page += 1;
+  //       _futureCategoryArticles = fetchCategoryArticles(page);
+  //     });
+  //   }
+  // }
 
   var isLoaded = false;
   BannerAd? bannerAd;
@@ -201,12 +201,12 @@ class _CategoryArticlesState extends State<CategoryArticles> {
                   child: articleBox(context, item, heroId),
                 );
               }).toList()),
-              !_infiniteStop
-                  ? Container(
-                      alignment: Alignment.center,
-                      height: 30,
-                    )
-                  : Container()
+              // !_infiniteStop
+              //     ? Container(
+              //         alignment: Alignment.center,
+              //         height: 30,
+              //       )
+              //     : Container()
             ],
           );
         } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
@@ -215,13 +215,25 @@ class _CategoryArticlesState extends State<CategoryArticles> {
           );
         } else if (articleSnapshot.hasError) {
           return Container(
-              height: 500,
-              alignment: Alignment.center,
-              child: Text("${articleSnapshot.error}"));
+            alignment: Alignment.center,
+            margin: EdgeInsets.fromLTRB(0, 60, 0, 0),
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: <Widget>[
+                Image.asset(
+                  "assets/no-internet.png",
+                  width: 250,
+                ),
+                Text("No Internet Connection."),
+              ],
+            ),
+          );
         }
         return Container(
-          alignment: Alignment.center,
-          height: 400,
+            alignment: Alignment.center,
+            width: 300,
+            height: 150
         );
       },
     );

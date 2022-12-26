@@ -52,7 +52,7 @@ class Article {
         content: content,
         // embedded: json['embedded'],
       author: author,
-        image: json['slug'],
+        image: json['featured_media'],
          category:category,
         date: date,
         link: json["link"],

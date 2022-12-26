@@ -8,12 +8,15 @@ import 'package:flutter_custom_carousel_slider/flutter_custom_carousel_slider.da
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../common/constants.dart';
 import '../models/Article.dart';
 import '../widgets/articleBox.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'notification_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +42,20 @@ class _ArticlesState extends State<Articles> {
   @override
   void initState() {
     super.initState();
-    OnRefIndicator(page);
+    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+    OneSignal.shared.setAppId("644c12e5-c265-455c-bc47-8279a305d646");
+
+    OneSignal.shared.setNotificationOpenedHandler((openedResult) {
+      var data =openedResult.notification.additionalData!;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NotificationScreen(data),
+              ),
+            );
+     }
+     );
+    // OnRefIndicator(page);
     _futureLastestArticles.value = fetchLatestArticles(1);
     // _futureFeaturedArticles = fetchFeaturedArticles(1);
     _controller =
@@ -79,7 +95,7 @@ class _ArticlesState extends State<Articles> {
       print('$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed');
       if (this.mounted) {
         if (response.statusCode == 200) {
-          latestArticles.value.addAll(json
+          latestArticles.value = (json
               .decode(response.body)
               .map((m) => Article.fromJson(m))
               .toList());
@@ -87,25 +103,23 @@ class _ArticlesState extends State<Articles> {
           if (latestArticles.value.length % 10 != 0) {
             _infiniteStop = true;
           }
-          latestArticles.value.forEach((item) {
-            itemList.value.add(
-              CarouselItem(
-                image: NetworkImage(
-                  item.image,
+          itemList.value = latestArticles.value
+              .map((item) => CarouselItem(
+            image: NetworkImage(
+              item.image,
+            ),
+            onImageTap: (i) {
+              final heroId = item.id.toString();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SingleArticle(item, heroId),
                 ),
-                onImageTap: (i) {
-                  final heroId = item.id.toString();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SingleArticle(item, heroId),
-                    ),
-                  );
-                  print(heroId);
-                },
-              ),
-            );
-          });
+              );
+              print(heroId);
+            },
+          ))
+              .toList();
 
           // print(itemList.length);
           setState(() {});
@@ -121,48 +135,48 @@ class _ArticlesState extends State<Articles> {
     return latestArticles.value;
   }
 
-  OnRefIndicator(int page) async {
-    try {
-      var response = await http
-          .get(Uri.parse('$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed'));
-      if (this.mounted) {
-        if (response.statusCode == 200) {
-          latestArticles.value = (json
-              .decode(response.body)
-              .map((m) => Article.fromJson(m))
-              .toList());
-          print("skjbdskjn");
-          print(latestArticles.value.length);
-
-          // if (latestArticles.length % 10 != 0) {
-          //   _infiniteStop = true;
-          // }
-          itemList.value = latestArticles.value.map((item) {
-            return CarouselItem(
-              image: NetworkImage(
-                item.image,
-              ),
-              onImageTap: (i) {
-                final heroId = item.id.toString();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SingleArticle(item, heroId),
-                  ),
-                );
-                print(item.link);
-              },
-            );
-          }).toList();
-
-          // print(itemList.length);
-          setState(() {});
-        }
-      }
-    } on SocketException {
-      throw 'No Internet connection';
-    }
-  }
+  // OnRefIndicator(int page) async {
+  //   try {
+  //     var response = await http
+  //         .get(Uri.parse('$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed'));
+  //     if (this.mounted) {
+  //       if (response.statusCode == 200) {
+  //         latestArticles.value = (json
+  //             .decode(response.body)
+  //             .map((m) => Article.fromJson(m))
+  //             .toList());
+  //         print("skjbdskjn");
+  //         print(latestArticles.value.length);
+  //
+  //         // if (latestArticles.length % 10 != 0) {
+  //         //   _infiniteStop = true;
+  //         // }
+  //         itemList.value = latestArticles.value.map((item) {
+  //           return CarouselItem(
+  //             image: NetworkImage(
+  //               item.image,
+  //             ),
+  //             onImageTap: (i) {
+  //               final heroId = item.id.toString();
+  //               Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (context) => SingleArticle(item, heroId),
+  //                 ),
+  //               );
+  //               print(item.link);
+  //             },
+  //           );
+  //         }).toList();
+  //
+  //         // print(itemList.length);
+  //         setState(() {});
+  //       }
+  //     }
+  //   } on SocketException {
+  //     throw 'No Internet connection';
+  //   }
+  // }
 
   // Future<List<dynamic>> fetchFeaturedArticles(int page) async {
   //   try {
@@ -249,98 +263,113 @@ class _ArticlesState extends State<Articles> {
         backgroundColor: Colors.red,
       ),
       body: Container(
-          decoration: BoxDecoration(color: Colors.white70),
-          child: Column(
-            children: <Widget>[
-              Obx(
-              ()=> FutureBuilder<List<dynamic>>(
-                  future: _futureLastestArticles.value,
-                  builder: (context, articleSnapshot) {
-                    if (articleSnapshot.hasData) {
-                      print(articleSnapshot.data);
-                      if (articleSnapshot.data!.length == 0) return Container();
-                      return Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            Container(
-                                child: CustomCarouselSlider(
-                              height: 180,
-                              items: itemList.value,
-                              showSubBackground: false,
-                              width: MediaQuery.of(context).size.width * 9,
-                              autoplay: true,
-                            )),
-                            SizedBox(
-                              height: 35,
-                            ),
-                            Expanded(
-                              child: RefreshIndicator(
-                                onRefresh: () async {
-                                  // await OnRefIndicator(page);
-                                  _futureLastestArticles.value = fetchLatestArticles(1);
-                                },
-                                child: Builder(builder: (context) {
-                                  // adsInserter(articleSnapshot.data);
-                                  return ListView(
-                                      children: articleSnapshot.data!.map((item) {
-                                    // if (item is BannerAd) {
-                                    //   return Container(
-                                    //     height: 50,
-                                    //     child: AdWidget(
-                                    //       ad: item,
-                                    //     ),
-                                    //   );
-                                    // }
-                                    final heroId = item.id.toString();
-                                    return InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            clickcount = clickcount + 1;
-                                            if (clickcount > 2) {
-                                              showInterstitial();
-                                              clickcount = 0;
-                                            }
-                                          });
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  SingleArticle(item, heroId),
-                                            ),
-                                          );
-                                        },
-                                        child: articleBox(context, item, heroId));
-                                  }).toList());
-                                }),
-                              ),
-                            ),
-                            // !_infiniteStop ? Container() : Container()
-                          ],
-                        ),
-                      );
-                    } else if (articleSnapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+        decoration: BoxDecoration(color: Colors.white70),
+        child: Column(
+          children: <Widget>[
+            Obx(
+                  () => FutureBuilder<List<dynamic>>(
+                future: _futureLastestArticles.value,
+                builder: (context, articleSnapshot) {
+                  if (articleSnapshot.hasData) {
+                    print(articleSnapshot.data);
+                    if (articleSnapshot.data!.isEmpty) return Container();
+                    return Expanded(
+                      flex: 2,
+                      child: Column(
                         children: [
-                          Center(child: CircularProgressIndicator()),
+                          Container(
+                              child: CustomCarouselSlider(
+                                height: 180,
+                                items: itemList.value,
+                                showSubBackground: false,
+                                width: MediaQuery.of(context).size.width * 9,
+                                autoplay: true,
+                              )),
+                          SizedBox(
+                            height: 35,
+                          ),
+                          Expanded(
+                            child: RefreshIndicator(
+                              onRefresh: () async {
+                                // await OnRefIndicator(page);
+                                _futureLastestArticles.value =
+                                    fetchLatestArticles(1);
+                              },
+                              child: Builder(builder: (context) {
+                                // adsInserter(articleSnapshot.data);
+                                return ListView(
+                                    children: articleSnapshot.data!.map((item) {
+                                      // if (item is BannerAd) {
+                                      //   return Container(
+                                      //     height: 50,
+                                      //     child: AdWidget(
+                                      //       ad: item,
+                                      //     ),
+                                      //   );
+                                      // }
+                                      final heroId = item.id.toString();
+                                      return InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              clickcount = clickcount + 1;
+                                              if (clickcount > 2) {
+                                                showInterstitial();
+                                                clickcount = 0;
+                                              }
+                                            });
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SingleArticle(item, heroId),
+                                              ),
+                                            );
+                                          },
+                                          child: articleBox(context, item, heroId));
+                                    }).toList());
+                              }),
+                            ),
+                          ),
+                          // !_infiniteStop ? Container() : Container()
                         ],
-                      );
-                    } else if (articleSnapshot.hasError) {
-                      return Container();
-                    }
+                      ),
+                    );
+                  } else if (articleSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(child: CircularProgressIndicator()),
+                      ],
+                    );
+                  } else if (articleSnapshot.hasError) {
                     return Container(
                       alignment: Alignment.center,
+                      margin: EdgeInsets.fromLTRB(0, 60, 0, 0),
                       width: MediaQuery.of(context).size.width,
-                      height: 150,
+                      height: MediaQuery.of(context).size.height,
+                      child: Column(
+                        children: <Widget>[
+                          Image.asset(
+                            "assets/no-internet.png",
+                            width: 250,
+                          ),
+                          Text("No Internet Connection."),
+                        ],
+                      ),
                     );
-                  },
-                ),
+                  }
+                  return Container(
+                      alignment: Alignment.center,
+                      width: 300,
+                      height: 150
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
 
       //Drawer
       drawer: Drawer(
@@ -383,7 +412,7 @@ class _ArticlesState extends State<Articles> {
               onTap: () {
                 launchYoutube(
                     Url:
-                        "https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
+                    "https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
               },
             ),
             ListTile(
@@ -400,89 +429,89 @@ class _ArticlesState extends State<Articles> {
     );
   }
 
-  // Widget latestPosts(Future<List<dynamic>> latestArticles) {
-  //   return FutureBuilder<List<dynamic>>(
-  //     future: latestArticles,
-  //     builder: (context, articleSnapshot) {
-  //       if (articleSnapshot.hasData) {
-  //         if (articleSnapshot.data!.length == 0) return Container();
-  //         return Expanded(
-  //           flex: 2,
-  //           child: Column(
-  //             children: [
-  //               Container(
-  //                   child: CustomCarouselSlider(
-  //                 height: 180,
-  //                 items: itemList,
-  //                 showSubBackground: false,
-  //                 width: MediaQuery.of(context).size.width * 9,
-  //                 autoplay: true,
-  //               )),
-  //               SizedBox(
-  //                 height: 35,
-  //               ),
-  //               Expanded(
-  //                 child: RefreshIndicator(
-  //                   onRefresh: () async {
-  //                     await OnRefIndicator(page);
-  //                   },
-  //                   child: Builder(builder: (context) {
-  //                     // adsInserter(articleSnapshot.data);
-  //                     return ListView(
-  //                         children: articleSnapshot.data!.map((item) {
-  //                       // if (item is BannerAd) {
-  //                       //   return Container(
-  //                       //     height: 50,
-  //                       //     child: AdWidget(
-  //                       //       ad: item,
-  //                       //     ),
-  //                       //   );
-  //                       // }
-  //                       final heroId = item.id.toString();
-  //                       return InkWell(
-  //                           onTap: () {
-  //                             setState(() {
-  //                               clickcount = clickcount + 1;
-  //                               if (clickcount > 2) {
-  //                                 showInterstitial();
-  //                                 clickcount = 0;
-  //                               }
-  //                             });
-  //                             Navigator.push(
-  //                               context,
-  //                               MaterialPageRoute(
-  //                                 builder: (context) =>
-  //                                     SingleArticle(item, heroId),
-  //                               ),
-  //                             );
-  //                           },
-  //                           child: articleBox(context, item, heroId));
-  //                     }).toList());
-  //                   }),
-  //                 ),
-  //               ),
-  //               // !_infiniteStop ? Container() : Container()
-  //             ],
-  //           ),
-  //         );
-  //       } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
-  //         return Column(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           children: [
-  //             Center(child: CircularProgressIndicator()),
-  //           ],
-  //         );
-  //       } else if (articleSnapshot.hasError) {
-  //         return Container();
-  //       }
-  //       return Container(
-  //         alignment: Alignment.center,
-  //         width: MediaQuery.of(context).size.width,
-  //         height: 150,
-  //       );
-  //     },
-  //   );
-  // }
+// Widget latestPosts(Future<List<dynamic>> latestArticles) {
+//   return FutureBuilder<List<dynamic>>(
+//     future: latestArticles,
+//     builder: (context, articleSnapshot) {
+//       if (articleSnapshot.hasData) {
+//         if (articleSnapshot.data!.length == 0) return Container();
+//         return Expanded(
+//           flex: 2,
+//           child: Column(
+//             children: [
+//               Container(
+//                   child: CustomCarouselSlider(
+//                 height: 180,
+//                 items: itemList,
+//                 showSubBackground: false,
+//                 width: MediaQuery.of(context).size.width * 9,
+//                 autoplay: true,
+//               )),
+//               SizedBox(
+//                 height: 35,
+//               ),
+//               Expanded(
+//                 child: RefreshIndicator(
+//                   onRefresh: () async {
+//                     await OnRefIndicator(page);
+//                   },
+//                   child: Builder(builder: (context) {
+//                     // adsInserter(articleSnapshot.data);
+//                     return ListView(
+//                         children: articleSnapshot.data!.map((item) {
+//                       // if (item is BannerAd) {
+//                       //   return Container(
+//                       //     height: 50,
+//                       //     child: AdWidget(
+//                       //       ad: item,
+//                       //     ),
+//                       //   );
+//                       // }
+//                       final heroId = item.id.toString();
+//                       return InkWell(
+//                           onTap: () {
+//                             setState(() {
+//                               clickcount = clickcount + 1;
+//                               if (clickcount > 2) {
+//                                 showInterstitial();
+//                                 clickcount = 0;
+//                               }
+//                             });
+//                             Navigator.push(
+//                               context,
+//                               MaterialPageRoute(
+//                                 builder: (context) =>
+//                                     SingleArticle(item, heroId),
+//                               ),
+//                             );
+//                           },
+//                           child: articleBox(context, item, heroId));
+//                     }).toList());
+//                   }),
+//                 ),
+//               ),
+//               // !_infiniteStop ? Container() : Container()
+//             ],
+//           ),
+//         );
+//       } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
+//         return Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             Center(child: CircularProgressIndicator()),
+//           ],
+//         );
+//       } else if (articleSnapshot.hasError) {
+//         return Container();
+//       }
+//       return Container(
+//         alignment: Alignment.center,
+//         width: MediaQuery.of(context).size.width,
+//         height: 150,
+//       );
+//     },
+//   );
+// }
 }
 
 void launchWhatsapp({@required number, @required message}) async {
@@ -492,7 +521,7 @@ void launchWhatsapp({@required number, @required message}) async {
 
 void launchYoutube({required String Url}) async {
   var url =
-      Uri.parse("https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
+  Uri.parse("https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {

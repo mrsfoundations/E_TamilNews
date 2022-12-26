@@ -44,17 +44,10 @@ Widget searchBoxes(BuildContext context,cat) {
 
             ],
           ),
+
         ),
       ),
-    );  },
-    // children: List.generate(CUSTOM_CATEGORIES.length, (index) {
-    //   var cat = CUSTOM_CATEGORIES[index];
-    //   var name = cat[0];
-    //   var image = cat[1];
-    //   var catId = cat[2];
-
-
-
-
+    );
+      },
   );
 }

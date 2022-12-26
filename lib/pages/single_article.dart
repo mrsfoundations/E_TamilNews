@@ -81,7 +81,7 @@ class _SingleArticleState extends State<SingleArticle> {
       int postId = widget.article.id;
       int cat_id = widget.article.cat_id;
       var response = await http.get(Uri.parse(
-          "$WORDPRESS_URL/wp-json/wp/v2/posts?exclude=$postId&_embedded&wp:term[][]=$cat_id&_embed"));
+          "$WORDPRESS_URL/wp-json/wp/v2/posts?exclude=$postId&categories[]=$cat_id&_embed"));
 
       if (this.mounted) {
         if (response.statusCode == 200) {
@@ -141,23 +141,22 @@ class _SingleArticleState extends State<SingleArticle> {
       return parsedString;
     }
 
-    String content = _parseHtmlString(widget.article.content) as String;
+    // String content = _parseHtmlString(widget.article.content) as String;
     final article = widget.article;
     final heroId = widget.heroId;
     final articleVideo = widget.article.video;
 
-    var articleLink = article.content.toString().split('<p>').last;
-
-    // String youtubeUrl = "";
-    // String dailymotionUrl = "";
-    // if (articleVideo.contains("youtube")) {
-    //   youtubeUrl = articleVideo.split('?v=')[1];
-    // }
-    // if (articleVideo.contains("dailymotion")) {
-    //   dailymotionUrl = articleVideo.split("/video/")[1];
-    // }
-
-    bool webViewMediaPlaybackAlwaysAllow;
+    // var articleLink = article.content.toString().split('<p>').last;
+    // // String youtubeUrl = "";
+    // // String dailymotionUrl = "";
+    // // if (articleVideo.contains("youtube")) {
+    // //   youtubeUrl = articleVideo.split('?v=')[1];
+    // // }
+    // // if (articleVideo.contains("dailymotion")) {
+    // //   dailymotionUrl = articleVideo.split("/video/")[1];
+    // // }
+    //
+    // bool webViewMediaPlaybackAlwaysAllow;
 
     return Scaffold(
       body: Container(
@@ -297,7 +296,7 @@ class _SingleArticleState extends State<SingleArticle> {
                           child: Row(
                             children: [
                               CircleAvatar(
-                                // backgroundImage: NetworkImage(article.avatar),
+                                 // backgroundImage: NetworkImage(article.avatar),
                                 radius: 15,
                               ),
                               Padding(
@@ -336,7 +335,7 @@ class _SingleArticleState extends State<SingleArticle> {
                     ],
                   ),
                 ),
-                relatedPosts(_futureRelatedArticles as Future<List<dynamic>>)
+                relatedPosts(_futureRelatedArticles as Future<List<dynamic>>),
               ],
             ),
           )),
