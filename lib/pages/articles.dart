@@ -16,6 +16,7 @@ import '../models/Article.dart';
 import '../widgets/articleBox.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../widgets/articleBoxFeatured.dart';
 import 'notification_page.dart';
 
 void main() async {
@@ -30,11 +31,11 @@ class Articles extends StatefulWidget {
 }
 
 class _ArticlesState extends State<Articles> {
-  // List<dynamic> featuredArticles = [];
+  List<dynamic> featuredArticles = [];
   Rx<List<dynamic>> latestArticles = Rx([]);
 
   Rxn<Future<List<dynamic>>?> _futureLastestArticles = Rxn();
-  // Future<List<dynamic>>? _futureFeaturedArticles;
+  Future<List<dynamic>>? _futureFeaturedArticles;
   ScrollController? _controller;
   int page = 1;
   bool _infiniteStop = false;
@@ -57,7 +58,7 @@ class _ArticlesState extends State<Articles> {
      );
     // OnRefIndicator(page);
     _futureLastestArticles.value = fetchLatestArticles(1);
-    // _futureFeaturedArticles = fetchFeaturedArticles(1);
+    _futureFeaturedArticles = fetchFeaturedArticles(1);
     _controller =
         ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
     _controller!.addListener(_scrollListener);
@@ -103,23 +104,23 @@ class _ArticlesState extends State<Articles> {
           if (latestArticles.value.length % 10 != 0) {
             _infiniteStop = true;
           }
-          itemList.value = latestArticles.value
-              .map((item) => CarouselItem(
-            image: NetworkImage(
-              item.image,
-            ),
-            onImageTap: (i) {
-              final heroId = item.id.toString();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SingleArticle(item, heroId),
-                ),
-              );
-              print(heroId);
-            },
-          ))
-              .toList();
+          // itemList.value = latestArticles.value
+          //     .map((item) => CarouselItem(
+          //   image: NetworkImage(
+          //     item.image,
+          //   ),
+          //   onImageTap: (i) {
+          //     final heroId = item.id.toString();
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => SingleArticle(item, heroId),
+          //       ),
+          //     );
+          //     print(heroId);
+          //   },
+          // ))
+          //     .toList();
 
           // print(itemList.length);
           setState(() {});
@@ -178,32 +179,32 @@ class _ArticlesState extends State<Articles> {
   //   }
   // }
 
-  // Future<List<dynamic>> fetchFeaturedArticles(int page) async {
-  //   try {
-  //     var response = await http.get(
-  //         Uri.parse("$WORDPRESS_URL/wp-json/wp/v2/posts?categories[]=7&page=$page&per_page=10&_fields=id,date,title,content,slug,link"));
-  //
-  //     if (this.mounted) {
-  //       if (response.statusCode == 200) {
-  //         setState(() {
-  //           featuredArticles.addAll(json
-  //               .decode(response.body)
-  //               .map((m) => Article.fromJson(m))
-  //               .toList());
-  //         });
-  //
-  //         return featuredArticles;
-  //       } else {
-  //         setState(() {
-  //           _infiniteStop = true;
-  //         });
-  //       }
-  //     }
-  //   } on SocketException {
-  //     throw 'No Internet connection';
-  //   }
-  //   return featuredArticles;
-  // }
+  Future<List<dynamic>> fetchFeaturedArticles(int page) async {
+    try {
+      var response = await http.get(
+          Uri.parse("$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed"));
+
+      if (this.mounted) {
+        if (response.statusCode == 200) {
+          setState(() {
+            featuredArticles.addAll(json
+                .decode(response.body)
+                .map((m) => Article.fromJson(m))
+                .toList());
+          });
+
+          return featuredArticles;
+        } else {
+          setState(() {
+            _infiniteStop = true;
+          });
+        }
+      }
+    } on SocketException {
+      throw 'No Internet connection';
+    }
+    return featuredArticles;
+  }
 
   _scrollListener() {
     var isEnd = _controller!.offset >= _controller!.position.maxScrollExtent &&
@@ -266,6 +267,8 @@ class _ArticlesState extends State<Articles> {
         decoration: BoxDecoration(color: Colors.white70),
         child: Column(
           children: <Widget>[
+            featuredPost(_futureFeaturedArticles as Future<List<dynamic>>),
+            SizedBox(height: 35),
             Obx(
                   () => FutureBuilder<List<dynamic>>(
                 future: _futureLastestArticles.value,
@@ -277,17 +280,17 @@ class _ArticlesState extends State<Articles> {
                       flex: 2,
                       child: Column(
                         children: [
-                          Container(
-                              child: CustomCarouselSlider(
-                                height: 180,
-                                items: itemList.value,
-                                showSubBackground: false,
-                                width: MediaQuery.of(context).size.width * 9,
-                                autoplay: true,
-                              )),
-                          SizedBox(
-                            height: 35,
-                          ),
+                          // Container(
+                          //     child: CustomCarouselSlider(
+                          //       height: 180,
+                          //       items: itemList.value,
+                          //       showSubBackground: false,
+                          //       width: MediaQuery.of(context).size.width * 9,
+                          //       autoplay: true,
+                          //     )),
+                          // const SizedBox(
+                          //   height: 35,
+                          // ),
                           Expanded(
                             child: RefreshIndicator(
                               onRefresh: () async {
@@ -512,7 +515,65 @@ class _ArticlesState extends State<Articles> {
 //     },
 //   );
 // }
+  Widget featuredPost(Future<List<dynamic>> featuredArticles) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: FutureBuilder<List<dynamic>>(
+        future: featuredArticles,
+        builder: (context, articleSnapshot) {
+          if (articleSnapshot.hasData) {
+            if (articleSnapshot.data!.length == 0) return Container();
+            return Row(
+                children: articleSnapshot.data!.map((item) {
+                  final heroId = item.id.toString() + "-featured";
+                  return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SingleArticle(item, heroId),
+                          ),
+                        );
+                      },
+                      child: articleBoxFeatured(context, item, heroId));
+                }).toList());
+          } else if (articleSnapshot.hasError) {
+            return Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.fromLTRB(0, 60, 0, 0),
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                children: <Widget>[
+                  Image.asset(
+                    "assets/no-internet.png",
+                    width: 250,
+                  ),
+                  Text("No Internet Connection."),
+                  TextButton.icon(
+                    icon: Icon(Icons.refresh),
+                    label: Text("Reload"),
+                    onPressed: () {
+                      _futureLastestArticles = fetchLatestArticles(1) as Rxn<Future<List>?>;
+                      _futureFeaturedArticles = fetchFeaturedArticles(1);
+                    },
+                  )
+                ],
+              ),
+            );
+          }
+          return Container(
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            height: 280,
+
+          );
+        },
+      ),
+    );
+  }
 }
+
 
 void launchWhatsapp({@required number, @required message}) async {
   String url = "whatsapp://send?phone=$number&text=$message";
