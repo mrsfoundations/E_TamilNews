@@ -15,7 +15,7 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
         Container(
           alignment: Alignment.bottomRight,
           child: Card(
-            elevation: 10,
+            elevation: 3,
             child: Padding(
               padding: EdgeInsets.fromLTRB(105, 0, 0, 0),
               child: Column(
@@ -24,8 +24,8 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
                     child: Html(
                       data: article.title!.length > 100
                           ? "<h2>" +
-                              article.title!.substring(0, 100) +
-                              "...</h2>"
+                          article.title!.substring(0, 100) +
+                          "...</h2>"
                           : "<h2>" + article.title.toString() + "</h2>",
                       style: {
                         "h2": Style(
@@ -70,19 +70,24 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
           ),
         ),
         Container(
-            padding: const EdgeInsets.fromLTRB(255, 63, 0, 0),
+            padding: const EdgeInsets.fromLTRB(250, 63, 0, 0),
             child: Row(children: <Widget>[
               Icon(
                 Icons.timer,
                 color: Colors.black45,
-                size: 8.0,
-              ),
-              Text(
-                article.date.toString(),
-                style:TextStyle(fontSize:8),
-                textAlign: TextAlign.left,
+                size: 12,
               ),
             ])),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(265,66,0,0),
+          child: Container(
+            child: Text(
+              article.date.toString(),
+              style:TextStyle(fontSize:8),
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(315, 45, 0, 0),
           child: IconButton(
@@ -113,22 +118,22 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
             ),
           ),
         ),
-      //   article.video != ""
-      //       ? Positioned(
-      //           left: 12,
-      //           top: 12,
-      //           child: Card(
-      //             child: CircleAvatar(
-      //               radius: 14,
-      //               backgroundColor: Colors.transparent,
-      //               child: Image.asset("assets/play-button.png"),
-      //             ),
-      //             elevation: 8,
-      //             shape: CircleBorder(),
-      //             clipBehavior: Clip.antiAlias,
-      //           ),
-      //         )
-      //       : Container(),
+        //   article.video != ""
+        //       ? Positioned(
+        //           left: 12,
+        //           top: 12,
+        //           child: Card(
+        //             child: CircleAvatar(
+        //               radius: 14,
+        //               backgroundColor: Colors.transparent,
+        //               child: Image.asset("assets/play-button.png"),
+        //             ),
+        //             elevation: 8,
+        //             shape: CircleBorder(),
+        //             clipBehavior: Clip.antiAlias,
+        //           ),
+        //         )
+        //       : Container(),
       ],
     ),
   );

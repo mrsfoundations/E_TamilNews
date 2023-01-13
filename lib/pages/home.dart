@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../common/constants.dart';
 import '../pages/articles.dart';
 import '../pages/search.dart';
 import '../pages/settings.dart';
@@ -31,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.didChangeDependencies();
 
     bannerAd=BannerAd(size:AdSize.banner,
-        adUnitId:"ca-app-pub-3940256099942544/6300978111",
+        adUnitId:BannerAd_ID,
         listener:BannerAdListener(
             onAdLoaded:(ad){
               setState(() {
@@ -71,10 +72,10 @@ class _MyHomePageState extends State<MyHomePage> {
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Categories'),
-            BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'More'),
+            BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Profile'),
           ],
           currentIndex: _selectedIndex,
-          fixedColor: Theme.of(context).primaryColor,
+          fixedColor: Colors.red,
           onTap: _onItemTapped,
           type: BottomNavigationBarType.fixed),
     );

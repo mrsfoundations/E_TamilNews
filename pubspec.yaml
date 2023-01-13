@@ -71,12 +71,18 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/privacy-policy.png
+    - assets/terms-and-conditions.png
+    - assets/EtamilLogo.jpeg
     - assets/etamil (1).png
+    - assets/youtube.png
+    - assets/instagram.png
+    - assets/twitter (1).png
+    - assets/facebook.png
     - assets/Whatsapp_icon.png
     - assets/Youtubeicon.png
     - assets/User_Avathar.png
     - assets/undraw_android_jr64.png
-    - assets/icon.png
     - assets/no-internet.png
     - assets/play-button.png
     - assets/boxed/fashion.png

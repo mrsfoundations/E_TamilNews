@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show SocketException;
+import 'package:e_tamilnews/pages/Terms_Conditions.dart';
+import 'package:e_tamilnews/pages/search.dart';
 import 'package:e_tamilnews/pages/settings.dart';
 import 'package:e_tamilnews/pages/single_article.dart';
 import 'package:flutter/material.dart';
@@ -15,15 +17,9 @@ import '../common/constants.dart';
 import '../models/Article.dart';
 import '../widgets/articleBox.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../widgets/articleBoxFeatured.dart';
+import 'PrivacyPolicy.dart';
 import 'notification_page.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize();
-  runApp(Articles());
-}
 
 class Articles extends StatefulWidget {
   @override
@@ -47,15 +43,14 @@ class _ArticlesState extends State<Articles> {
     OneSignal.shared.setAppId("644c12e5-c265-455c-bc47-8279a305d646");
 
     OneSignal.shared.setNotificationOpenedHandler((openedResult) {
-      var data =openedResult.notification.additionalData!;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NotificationScreen(data),
-              ),
-            );
-     }
-     );
+      var data = openedResult.notification.additionalData!;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NotificationScreen(data),
+        ),
+      );
+    });
     // OnRefIndicator(page);
     _futureLastestArticles.value = fetchLatestArticles(1);
     _futureFeaturedArticles = fetchFeaturedArticles(1);
@@ -74,7 +69,7 @@ class _ArticlesState extends State<Articles> {
       value.insert(
         value.length - 1,
         BannerAd(
-          adUnitId: "ca-app-pub-3940256099942544/6300978111",
+          adUnitId: BannerAd_ID,
           size: AdSize.banner,
           request: AdRequest(),
           listener: BannerAdListener(),
@@ -181,8 +176,8 @@ class _ArticlesState extends State<Articles> {
 
   Future<List<dynamic>> fetchFeaturedArticles(int page) async {
     try {
-      var response = await http.get(
-          Uri.parse("$WORDPRESS_URL/wp-json/wp/v2/posts/?_embed"));
+      var response = await http
+          .get(Uri.parse("$WORDPRESS_URL/wp-json/wp/v2/posts/?categories[]=$FEATURED_ID&_embed"));
 
       if (this.mounted) {
         if (response.statusCode == 200) {
@@ -224,7 +219,7 @@ class _ArticlesState extends State<Articles> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     InterstitialAd.load(
-      adUnitId: "ca-app-pub-3940256099942544/1033173712",
+      adUnitId: InterstitialAd_ID,
       request: AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
@@ -259,9 +254,144 @@ class _ArticlesState extends State<Articles> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Etamilnews"),
-        elevation: 5,
-        backgroundColor: Colors.red,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/etamil (1).png',
+              fit: BoxFit.contain,
+              height: 30,
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red[400],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(color: Colors.red[400]),
+              currentAccountPictureSize: Size.square(180),
+              currentAccountPicture: Padding(
+                padding: const EdgeInsets.fromLTRB(95, 0, 0, 110),
+                child: CircleAvatar(
+                  backgroundImage: AssetImage("assets/EtamilLogo.jpeg"),
+                ),
+              ),
+              accountName: Padding(
+                padding: const EdgeInsets.fromLTRB(80, 0, 0, 0),
+                child: Text(
+                  "ETamilNews",
+                  style: TextStyle(fontSize: 24),
+                ),
+              ),
+              accountEmail: Padding(
+                padding: const EdgeInsets.fromLTRB(83, 0, 0, 0),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      child: Image.asset(
+                        'assets/facebook.png',
+                        fit: BoxFit.contain,
+                        height: 30,
+                      ),
+                      onTap: () {
+                        launchFB(
+                            Url: "https://www.facebook.com/etamilnewslive");
+                      },
+                    ),
+                    SizedBox(width: 2),
+                    GestureDetector(
+                      child: Image.asset(
+                        'assets/twitter (1).png',
+                        fit: BoxFit.contain,
+                        height: 35,
+                      ),
+                      onTap: () {
+                        launchTwitter(
+                            Url: "https://twitter.com/etamilnewslive");
+                      },
+                    ),
+                    SizedBox(width: 2),
+                    GestureDetector(
+                      child: Image.asset(
+                        'assets/youtube.png',
+                        fit: BoxFit.contain,
+                        height: 30,
+                      ),
+                      onTap: _launchURL,
+                    ),
+                  ],
+                ),
+              ),
+            ), //circleAvatar
+
+            // ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text("Home"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Articles()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.search),
+              title: Text("Categories"),
+              onTap: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Search()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.menu),
+              title: Text("Profile"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Settings()));
+              },
+            ),
+            ListTile(
+              leading: Image.asset(
+                'assets/Whatsapp_icon.png',
+                height: 25,
+              ),
+              title: Text("What's App"),
+              onTap: () {
+                launchWhatsapp(number: "+919790055058", message: "Hi");
+              },
+            ),
+            ListTile(
+              leading: Image.asset(
+                'assets/Youtubeicon.png',
+                width: 25,
+              ),
+              title: Text("Youtube"),
+              onTap: _launchURL,
+            ),
+            ListTile(
+              leading: Image.asset(
+                'assets/privacy-policy.png',
+                width: 25,
+              ),
+              title: Text("Privacy Policy"),
+              onTap: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => PrivacyPolicy()));
+              },
+            ),
+            ListTile(
+              leading: Image.asset(
+                'assets/terms-and-conditions.png',
+                width: 25,
+              ),
+              title: Text("Terms & Conditions"),
+              onTap: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Terms_Conditions()));
+              },
+            ),
+          ],
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(color: Colors.white70),
@@ -270,7 +400,7 @@ class _ArticlesState extends State<Articles> {
             featuredPost(_futureFeaturedArticles as Future<List<dynamic>>),
             SizedBox(height: 35),
             Obx(
-                  () => FutureBuilder<List<dynamic>>(
+              () => FutureBuilder<List<dynamic>>(
                 future: _futureLastestArticles.value,
                 builder: (context, articleSnapshot) {
                   if (articleSnapshot.hasData) {
@@ -299,37 +429,37 @@ class _ArticlesState extends State<Articles> {
                                     fetchLatestArticles(1);
                               },
                               child: Builder(builder: (context) {
-                                // adsInserter(articleSnapshot.data);
+                                 adsInserter(articleSnapshot.data);
                                 return ListView(
                                     children: articleSnapshot.data!.map((item) {
-                                      // if (item is BannerAd) {
-                                      //   return Container(
-                                      //     height: 50,
-                                      //     child: AdWidget(
-                                      //       ad: item,
-                                      //     ),
-                                      //   );
-                                      // }
-                                      final heroId = item.id.toString();
-                                      return InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              clickcount = clickcount + 1;
-                                              if (clickcount > 2) {
-                                                showInterstitial();
-                                                clickcount = 0;
-                                              }
-                                            });
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SingleArticle(item, heroId),
-                                              ),
-                                            );
-                                          },
-                                          child: articleBox(context, item, heroId));
-                                    }).toList());
+                                  if (item is BannerAd) {
+                                    return Container(
+                                      height: 50,
+                                      child: AdWidget(
+                                        ad: item,
+                                      ),
+                                    );
+                                  }
+                                  final heroId = item.id.toString();
+                                  return InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          clickcount = clickcount + 1;
+                                          if (clickcount > 2) {
+                                            showInterstitial();
+                                            clickcount = 0;
+                                          }
+                                        });
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                SingleArticle(item, heroId),
+                                          ),
+                                        );
+                                      },
+                                      child: articleBox(context, item, heroId));
+                                }).toList());
                               }),
                             ),
                           ),
@@ -363,68 +493,9 @@ class _ArticlesState extends State<Articles> {
                     );
                   }
                   return Container(
-                      alignment: Alignment.center,
-                      width: 300,
-                      height: 150
-                  );
+                      alignment: Alignment.center, width: 300, height: 150);
                 },
               ),
-            ),
-          ],
-        ),
-      ),
-
-      //Drawer
-      drawer: Drawer(
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          children: <Widget>[
-            DrawerHeader(
-              child: Text(
-                "Etamilnews",
-                style: TextStyle(fontSize: 25),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text("Profile"),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Settings()));
-              },
-            ),
-            ListTile(
-              leading: Image.asset(
-                'assets/Whatsapp_icon.png',
-                height: 25,
-              ),
-              title: Text("What's App"),
-              onTap: () {
-                launchWhatsapp(number: "+919790055058", message: "Hi");
-              },
-            ),
-            ListTile(
-              leading: Image.asset(
-                'assets/Youtubeicon.png',
-                width: 25,
-              ),
-              title: Text("Youtube"),
-              onTap: () {
-                launchYoutube(
-                    Url:
-                    "https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.share),
-              title: Text("Share This App"),
-              onTap: () {
-                Share.share(
-                    'https://github.com/mrsfoundations/Flutter-for-Wordpress-App');
-              },
             ),
           ],
         ),
@@ -432,89 +503,6 @@ class _ArticlesState extends State<Articles> {
     );
   }
 
-// Widget latestPosts(Future<List<dynamic>> latestArticles) {
-//   return FutureBuilder<List<dynamic>>(
-//     future: latestArticles,
-//     builder: (context, articleSnapshot) {
-//       if (articleSnapshot.hasData) {
-//         if (articleSnapshot.data!.length == 0) return Container();
-//         return Expanded(
-//           flex: 2,
-//           child: Column(
-//             children: [
-//               Container(
-//                   child: CustomCarouselSlider(
-//                 height: 180,
-//                 items: itemList,
-//                 showSubBackground: false,
-//                 width: MediaQuery.of(context).size.width * 9,
-//                 autoplay: true,
-//               )),
-//               SizedBox(
-//                 height: 35,
-//               ),
-//               Expanded(
-//                 child: RefreshIndicator(
-//                   onRefresh: () async {
-//                     await OnRefIndicator(page);
-//                   },
-//                   child: Builder(builder: (context) {
-//                     // adsInserter(articleSnapshot.data);
-//                     return ListView(
-//                         children: articleSnapshot.data!.map((item) {
-//                       // if (item is BannerAd) {
-//                       //   return Container(
-//                       //     height: 50,
-//                       //     child: AdWidget(
-//                       //       ad: item,
-//                       //     ),
-//                       //   );
-//                       // }
-//                       final heroId = item.id.toString();
-//                       return InkWell(
-//                           onTap: () {
-//                             setState(() {
-//                               clickcount = clickcount + 1;
-//                               if (clickcount > 2) {
-//                                 showInterstitial();
-//                                 clickcount = 0;
-//                               }
-//                             });
-//                             Navigator.push(
-//                               context,
-//                               MaterialPageRoute(
-//                                 builder: (context) =>
-//                                     SingleArticle(item, heroId),
-//                               ),
-//                             );
-//                           },
-//                           child: articleBox(context, item, heroId));
-//                     }).toList());
-//                   }),
-//                 ),
-//               ),
-//               // !_infiniteStop ? Container() : Container()
-//             ],
-//           ),
-//         );
-//       } else if (articleSnapshot.connectionState == ConnectionState.waiting) {
-//         return Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Center(child: CircularProgressIndicator()),
-//           ],
-//         );
-//       } else if (articleSnapshot.hasError) {
-//         return Container();
-//       }
-//       return Container(
-//         alignment: Alignment.center,
-//         width: MediaQuery.of(context).size.width,
-//         height: 150,
-//       );
-//     },
-//   );
-// }
   Widget featuredPost(Future<List<dynamic>> featuredArticles) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -525,18 +513,18 @@ class _ArticlesState extends State<Articles> {
             if (articleSnapshot.data!.length == 0) return Container();
             return Row(
                 children: articleSnapshot.data!.map((item) {
-                  final heroId = item.id.toString() + "-featured";
-                  return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SingleArticle(item, heroId),
-                          ),
-                        );
-                      },
-                      child: articleBoxFeatured(context, item, heroId));
-                }).toList());
+              final heroId = item.id.toString() + "-featured";
+              return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SingleArticle(item, heroId),
+                      ),
+                    );
+                  },
+                  child: articleBoxFeatured(context, item, heroId));
+            }).toList());
           } else if (articleSnapshot.hasError) {
             return Container(
               alignment: Alignment.center,
@@ -554,7 +542,8 @@ class _ArticlesState extends State<Articles> {
                     icon: Icon(Icons.refresh),
                     label: Text("Reload"),
                     onPressed: () {
-                      _futureLastestArticles = fetchLatestArticles(1) as Rxn<Future<List>?>;
+                      _futureLastestArticles =
+                          fetchLatestArticles(1) as Rxn<Future<List>?>;
                       _futureFeaturedArticles = fetchFeaturedArticles(1);
                     },
                   )
@@ -566,7 +555,6 @@ class _ArticlesState extends State<Articles> {
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width,
             height: 280,
-
           );
         },
       ),
@@ -574,18 +562,43 @@ class _ArticlesState extends State<Articles> {
   }
 }
 
-
 void launchWhatsapp({@required number, @required message}) async {
   String url = "whatsapp://send?phone=$number&text=$message";
   await launchUrlString(url) ? (url) : print("can't open whatsapp");
 }
 
-void launchYoutube({required String Url}) async {
-  var url =
-  Uri.parse("https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
+void launchFB({required String Url}) async {
+  var url = Uri.parse("https://www.facebook.com/etamilnewslive");
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {
     throw "Could't Launch $url";
+  }
+}
+
+void launchInsta({required String Url}) async {
+  var url = Uri.parse("https://www.instagram.com/etamilnewslive/");
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
+  } else {
+    throw "Could't Launch $url";
+  }
+}
+
+void launchTwitter({required String Url}) async {
+  var url = Uri.parse("https://twitter.com/etamilnewslive");
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
+  } else {
+    throw "Could't Launch $url";
+  }
+}
+
+void _launchURL() async {
+  const url = 'https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug';
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
   }
 }

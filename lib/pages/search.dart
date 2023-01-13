@@ -16,6 +16,9 @@ import '../models/Article.dart';
 import '../models/category_article.dart';
 import '../widgets/articleBox.dart';
 import '../widgets/searchBoxes.dart';
+import 'PrivacyPolicy.dart';
+import 'Terms_Conditions.dart';
+import 'articles.dart';
 import 'authentication/email/login.dart';
 
 class Search extends StatefulWidget {
@@ -54,8 +57,8 @@ class _SearchState extends State<Search> {
         return searchedArticles;
       }
 
-      var response = await http.get(
-          Uri.parse("$WORDPRESS_URL/wp-json/wp/v2/posts?search=$searchText&page=$page&_embed"));
+      var response = await http.get(Uri.parse(
+          "$WORDPRESS_URL/wp-json/wp/v2/posts?search=$searchText&page=$page&_embed"));
 
       if (this.mounted) {
         if (response.statusCode == 200) {
@@ -117,30 +120,27 @@ class _SearchState extends State<Search> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     InterstitialAd.load(
-      adUnitId:"ca-app-pub-3940256099942544/1033173712",
-      request:AdRequest( ),
-      adLoadCallback:InterstitialAdLoadCallback(
-        onAdLoaded: (ad){
+      adUnitId:InterstitialAd_ID,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
           setState(() {
-            isLoaded=true;
-            this.interstitialAd=ad;
-
+            isLoaded = true;
+            this.interstitialAd = ad;
           });
           print("Ad");
         },
-        onAdFailedToLoad: (error){
+        onAdFailedToLoad: (error) {
           print("Interstitial Ad");
         },
       ),
     );
   }
 
-  void showInterstitial()async{
+  void showInterstitial() async {
     interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (InterstitialAd ad) =>
-          print('Ad Showed'),
-      onAdDismissedFullScreenContent: (InterstitialAd ad) =>
-          ad.dispose(),
+      onAdShowedFullScreenContent: (InterstitialAd ad) => print('Ad Showed'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) => ad.dispose(),
       onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
         Navigator.of(context).pop();
         ad.dispose();
@@ -151,32 +151,43 @@ class _SearchState extends State<Search> {
   }
 
   cat() async {
-    var response = await http.get(Uri.parse(
-        CATEGORIES_URL));
+    var response = await http.get(Uri.parse(CATEGORIES_URL));
     print(jsonDecode(response.body));
     // if (response.statusCode == 200) {
-      setState(() {
-        categoriesArticles.addAll(json
-            .decode(response.body)
-            .map((m) => CategoryArticle.fromJson(m))
-            .toList());
-        print("");
-      });
+    setState(() {
+      categoriesArticles.addAll(json
+          .decode(response.body)
+          .map((m) => CategoryArticle.fromJson(m))
+          .toList());
+      print("");
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Categories',
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                fontFamily: 'Poppins')),
-        elevation: 5,
-        backgroundColor: Colors.red,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Categories',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontFamily: 'Poppins'),
+              ),
+            ),
+            Image.asset(
+              'assets/etamil (1).png',
+              fit: BoxFit.contain,
+              height: 30,
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red[400],
       ),
       body: SingleChildScrollView(
         controller: _controller,
@@ -227,18 +238,83 @@ class _SearchState extends State<Search> {
       ),
       drawer: Drawer(
         child: ListView(
-          // Important: Remove any padding from the ListView.
-          children: <Widget>[
-            DrawerHeader(
-              child:Text("Etamilnews",
-                style:TextStyle(fontSize: 25),
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(color: Colors.red[400]),
+              currentAccountPictureSize: Size.square(180),
+              currentAccountPicture: Padding(
+                padding: const EdgeInsets.fromLTRB(95, 0, 0, 110),
+                child: CircleAvatar(
+                  backgroundImage: AssetImage("assets/EtamilLogo.jpeg"),
+                ),
               ),
-              decoration: BoxDecoration(
-                color: Colors.blue,
+              accountName: Padding(
+                padding: const EdgeInsets.fromLTRB(80, 0, 0, 0),
+                child: Text(
+                  "ETamilNews",
+                  style: TextStyle(fontSize: 24),
+                ),
               ),
+              accountEmail: Padding(
+                padding: const EdgeInsets.fromLTRB(83, 0, 0, 0),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      child: Image.asset(
+                        'assets/facebook.png',
+                        fit: BoxFit.contain,
+                        height: 30,
+                      ),
+                      onTap: () {
+                        launchFB(
+                            Url: "https://www.facebook.com/etamilnewslive");
+                      },
+                    ),
+                    SizedBox(width: 2),
+                    GestureDetector(
+                      child: Image.asset(
+                        'assets/twitter (1).png',
+                        fit: BoxFit.contain,
+                        height: 35,
+                      ),
+                      onTap: () {
+                        launchTwitter(
+                            Url: "https://twitter.com/etamilnewslive");
+                      },
+                    ),
+                    SizedBox(width: 2),
+                    GestureDetector(
+                      child: Image.asset(
+                        'assets/youtube.png',
+                        fit: BoxFit.contain,
+                        height: 30,
+                      ),
+                      onTap: _launchURL,
+                    ),
+                  ],
+                ),
+              ),
+            ), //circleAvatar
+
+            // ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text("Home"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Articles()));
+              },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: Icon(Icons.search),
+              title: Text("Categories"),
+              onTap: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Search()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.menu),
               title: Text("Profile"),
               onTap: () {
                 Navigator.push(context,
@@ -246,27 +322,43 @@ class _SearchState extends State<Search> {
               },
             ),
             ListTile(
-              leading:  Image.asset('assets/Whatsapp_icon.png',height: 25,),
+              leading: Image.asset(
+                'assets/Whatsapp_icon.png',
+                height: 25,
+              ),
               title: Text("What's App"),
               onTap: () {
                 launchWhatsapp(number: "+919790055058", message: "Hi");
               },
             ),
             ListTile(
-              leading:  Image.asset('assets/Youtubeicon.png',width: 25,),
+              leading: Image.asset(
+                'assets/Youtubeicon.png',
+                width: 25,
+              ),
               title: Text("Youtube"),
+              onTap: _launchURL,
+            ),
+            ListTile(
+              leading: Image.asset(
+                'assets/privacy-policy.png',
+                width: 25,
+              ),
+              title: Text("Privacy Policy"),
               onTap: () {
-                launchYoutube(
-                    Url:
-                    "https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => PrivacyPolicy()));
               },
             ),
             ListTile(
-              leading: Icon(Icons.share),
-              title: Text("Share This App"),
+              leading: Image.asset(
+                'assets/terms-and-conditions.png',
+                width: 25,
+              ),
+              title: Text("Terms & Conditions"),
               onTap: () {
-                Share.share(
-                    'https://github.com/mrsfoundations/Flutter-for-Wordpress-App');
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Terms_Conditions()));
               },
             ),
           ],
@@ -283,7 +375,7 @@ class _SearchState extends State<Search> {
           if (articleSnapshot.data!.length == 0) {
             return Column(
               children: <Widget>[
-                searchBoxes(context,categoriesArticles),
+                searchBoxes(context, categoriesArticles),
               ],
             );
           }
@@ -293,28 +385,32 @@ class _SearchState extends State<Search> {
                   children: articleSnapshot.data!.map((item) {
                 final heroId = item.category.toString() + "-searched";
                 return InkWell(
-                  onTap: () {
-                    setState(() {
-                      // clickcount = clickcount +1 ;
-                      // if (clickcount > 2) {
-                      //   showInterstitial();
-                      //   clickcount = 0;
-                      // }
-                    });
-                    Navigator.push(
+                    onTap: () {
+                      setState(() {
+                        clickcount = clickcount +1 ;
+                        if (clickcount > 2) {
+                          showInterstitial();
+                          clickcount = 0;
+                        }
+                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SingleArticle(item, heroId),
+                        ),
+                      );
+                    },
+                    child: articleBox(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => SingleArticle(item, heroId),
-                      ),
-                    );
-                  },
-                  child: articleBox(context, item, heroId,));
+                      item,
+                      heroId,
+                    ));
               }).toList()),
               !_infiniteStop
                   ? Container(
                       alignment: Alignment.center,
                       height: 30,
-                          )
+                    )
                   : Container()
             ],
           );
@@ -343,26 +439,49 @@ class _SearchState extends State<Search> {
             ),
           );
         }
-        return Container(
-            alignment: Alignment.center,
-            width: 300,
-            height: 150
-            );
+        return Container(alignment: Alignment.center, width: 300, height: 150);
       },
     );
   }
+
   void launchWhatsapp({@required number, @required message}) async {
     String url = "whatsapp://send?phone=$number&text=$message";
     await launchUrlString(url) ? (url) : print("can't open whatsapp");
   }
 
-  void launchYoutube({required String Url}) async {
-    var url = Uri.parse(
-        "https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug");
+  void launchFB({required String Url}) async {
+    var url = Uri.parse("https://www.facebook.com/etamilnewslive");
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
-      throw"Could't Launch $url";
+      throw "Could't Launch $url";
+    }
+  }
+
+  void launchInsta({required String Url}) async {
+    var url = Uri.parse("https://www.instagram.com/etamilnewslive/");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw "Could't Launch $url";
+    }
+  }
+
+  void launchTwitter({required String Url}) async {
+    var url = Uri.parse("https://twitter.com/etamilnewslive");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw "Could't Launch $url";
+    }
+  }
+
+  void _launchURL() async {
+    const url = 'https://www.youtube.com/channel/UCoJyIjwgBfoBbdfqhe5Kjug';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 }
