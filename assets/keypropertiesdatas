@@ -1,0 +1,5 @@
+//used to make signed app bundle
+storePassword=ETamilNews
+keyPassword=ETamilNews
+keyAlias=Narasimman
+storeFile=F:/EtamilNews/upload-keystore.jks
