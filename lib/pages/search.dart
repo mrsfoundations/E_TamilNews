@@ -267,7 +267,7 @@ class _SearchState extends State<Search> {
                       ),
                       onTap: () {
                         launchFB(
-                            Url: "https://www.facebook.com/etamilnewslive");
+                            Url:Facebook);
                       },
                     ),
                     SizedBox(width: 2),
@@ -279,7 +279,7 @@ class _SearchState extends State<Search> {
                       ),
                       onTap: () {
                         launchTwitter(
-                            Url: "https://twitter.com/etamilnewslive");
+                            Url: Twitter);
                       },
                     ),
                     SizedBox(width: 2),
@@ -328,7 +328,7 @@ class _SearchState extends State<Search> {
               ),
               title: Text("What's App"),
               onTap: () {
-                launchWhatsapp(number: "+919790055058", message: "Hi");
+                launchWhatsapp(number: Phone_No, message: "Hi");
               },
             ),
             ListTile(
@@ -450,7 +450,7 @@ class _SearchState extends State<Search> {
   }
 
   void launchFB({required String Url}) async {
-    var url = Uri.parse("https://www.facebook.com/etamilnewslive");
+    var url = Uri.parse(Facebook);
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
@@ -468,7 +468,7 @@ class _SearchState extends State<Search> {
   }
 
   void launchTwitter({required String Url}) async {
-    var url = Uri.parse("https://twitter.com/etamilnewslive");
+    var url = Uri.parse(Twitter);
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {

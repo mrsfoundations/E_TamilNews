@@ -39,18 +39,18 @@ class _ArticlesState extends State<Articles> {
   @override
   void initState() {
     super.initState();
-    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
-    OneSignal.shared.setAppId("644c12e5-c265-455c-bc47-8279a305d646");
-
-    OneSignal.shared.setNotificationOpenedHandler((openedResult) {
-      var data = openedResult.notification.additionalData!;
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => NotificationScreen(data),
-        ),
-      );
-    });
+    // OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+    // OneSignal.shared.setAppId("644c12e5-c265-455c-bc47-8279a305d646");
+    //
+    // OneSignal.shared.setNotificationOpenedHandler((openedResult) {
+    //   var data = openedResult.notification.additionalData!;
+    //   Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => NotificationScreen(data),
+    //     ),
+    //   );
+    // });
     // OnRefIndicator(page);
     _futureLastestArticles.value = fetchLatestArticles(1);
     _futureFeaturedArticles = fetchFeaturedArticles(1);
@@ -296,7 +296,7 @@ class _ArticlesState extends State<Articles> {
                       ),
                       onTap: () {
                         launchFB(
-                            Url: "https://www.facebook.com/etamilnewslive");
+                            Url: Facebook);
                       },
                     ),
                     SizedBox(width: 2),
@@ -308,7 +308,7 @@ class _ArticlesState extends State<Articles> {
                       ),
                       onTap: () {
                         launchTwitter(
-                            Url: "https://twitter.com/etamilnewslive");
+                            Url: Twitter);
                       },
                     ),
                     SizedBox(width: 2),
@@ -357,7 +357,7 @@ class _ArticlesState extends State<Articles> {
               ),
               title: Text("What's App"),
               onTap: () {
-                launchWhatsapp(number: "+919790055058", message: "Hi");
+                launchWhatsapp(number:Phone_No, message: "Hi");
               },
             ),
             ListTile(
@@ -568,7 +568,7 @@ void launchWhatsapp({@required number, @required message}) async {
 }
 
 void launchFB({required String Url}) async {
-  var url = Uri.parse("https://www.facebook.com/etamilnewslive");
+  var url = Uri.parse(Facebook);
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {
@@ -576,17 +576,17 @@ void launchFB({required String Url}) async {
   }
 }
 
-void launchInsta({required String Url}) async {
-  var url = Uri.parse("https://www.instagram.com/etamilnewslive/");
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url);
-  } else {
-    throw "Could't Launch $url";
-  }
-}
+// void launchInsta({required String Url}) async {
+//   var url = Uri.parse("https://www.instagram.com/etamilnewslive/");
+//   if (await canLaunchUrl(url)) {
+//     await launchUrl(url);
+//   } else {
+//     throw "Could't Launch $url";
+//   }
+// }
 
 void launchTwitter({required String Url}) async {
-  var url = Uri.parse("https://twitter.com/etamilnewslive");
+  var url = Uri.parse(Twitter);
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {

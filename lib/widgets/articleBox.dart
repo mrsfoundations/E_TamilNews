@@ -22,17 +22,17 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
                 children: <Widget>[
                   Container(
                     child: Html(
-                      data: article.title!.length > 100
+                      data: article.title!.length > 65
                           ? "<h2>" +
-                          article.title!.substring(0, 100) +
+                          article.title!.substring(0,65) +
                           "...</h2>"
                           : "<h2>" + article.title.toString() + "</h2>",
                       style: {
                         "h2": Style(
                           color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: FontSize.percent(65),
-                          margin: EdgeInsets.fromLTRB(0,13, 0, 0),
+                          fontWeight: FontWeight.w700,
+                          fontSize: FontSize.percent(90),
+                          margin: EdgeInsets.fromLTRB(0,0, 0, 0),
                           padding: EdgeInsets.fromLTRB(25, 0, 0, 0),
                         )
                       },
@@ -50,13 +50,13 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.fromLTRB(139, 49, 0, 3),
+                padding: const EdgeInsets.fromLTRB(138, 51, 0, 3),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Color(0xFFE3E3E3),
                       borderRadius: BorderRadius.circular(3)),
                   padding: const EdgeInsets.fromLTRB(3, 3, 3, 3),
-                  margin:  EdgeInsets.fromLTRB(4, 3, 4, 3),
+                  margin:  EdgeInsets.fromLTRB(2, 3, 4, 3),
                   child: Text(
                     article.category.toString(),
                     style: TextStyle(
@@ -70,7 +70,7 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
           ),
         ),
         Container(
-            padding: const EdgeInsets.fromLTRB(250, 63, 0, 0),
+            padding: const EdgeInsets.fromLTRB(245, 63, 0, 0),
             child: Row(children: <Widget>[
               Icon(
                 Icons.timer,
@@ -79,7 +79,7 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
               ),
             ])),
         Padding(
-          padding: const EdgeInsets.fromLTRB(265,66,0,0),
+          padding: const EdgeInsets.fromLTRB(260,66,0,0),
           child: Container(
             child: Text(
               article.date.toString(),
@@ -89,7 +89,7 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(315, 45, 0, 0),
+          padding: const EdgeInsets.fromLTRB(315, 48, 0, 0),
           child: IconButton(
             icon: Icon(Icons.share, color: Colors.black45, size: 15.0),
             onPressed: () {
@@ -98,7 +98,7 @@ Widget articleBox(BuildContext context, Article article, String heroId) {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(0),
           child: SizedBox(
             height: 85,
             width: 140,

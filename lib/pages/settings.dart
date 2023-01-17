@@ -4,6 +4,7 @@ import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../common/constants.dart';
 import 'PrivacyPolicy.dart';
 import 'Terms_Conditions.dart';
 import 'articles.dart';
@@ -70,7 +71,7 @@ class _SettingsState extends State<Settings> {
                         padding: const EdgeInsets.fromLTRB(0, 0, 295, 0),
                         child: GestureDetector(child: Image.asset("assets/Whatsapp_icon.png",height: 30,),
                           onTap: (){
-                          launchWhatsapp(number: "+919790055058", message: "Hi");
+                          launchWhatsapp(number: Phone_No, message: "Hi");
                           },
                         ),
                       )
@@ -92,7 +93,7 @@ class _SettingsState extends State<Settings> {
                         ),
                         onTap: () {
                           launchFB(
-                              Url: "https://www.facebook.com/etamilnewslive");
+                              Url: Facebook);
                         },
                       ),
                       SizedBox(width: 2),
@@ -104,7 +105,7 @@ class _SettingsState extends State<Settings> {
                         ),
                         onTap: () {
                           launchTwitter(
-                              Url: "https://twitter.com/etamilnewslive");
+                              Url:Twitter);
                         },
                       ),
                       SizedBox(width: 2),
@@ -159,7 +160,7 @@ class _SettingsState extends State<Settings> {
                  child: ListTile(
                       title: Text('Connect with CloudsIndia'),
                       subtitle:
-                      Text("We are ready to help you to create"),
+                      Text("We are ready to Create a App For You"),
                     ),
                  onTap: () {
                    launchCloudsindia(
@@ -210,7 +211,7 @@ class _SettingsState extends State<Settings> {
                       ),
                       onTap: () {
                         launchFB(
-                            Url: "https://www.facebook.com/etamilnewslive");
+                            Url:Facebook);
                       },
                     ),
                     SizedBox(width: 2),
@@ -222,7 +223,7 @@ class _SettingsState extends State<Settings> {
                       ),
                       onTap: () {
                         launchTwitter(
-                            Url: "https://twitter.com/etamilnewslive");
+                            Url:Twitter);
                       },
                     ),
                     SizedBox(width: 2),
@@ -271,7 +272,7 @@ class _SettingsState extends State<Settings> {
               ),
               title: Text("What's App"),
               onTap: () {
-                launchWhatsapp(number: "+919790055058", message: "Hi");
+                launchWhatsapp(number:Phone_No, message: "Hi");
               },
             ),
             ListTile(
@@ -316,7 +317,7 @@ void launchWhatsapp({@required number, @required message}) async {
   }
 
 void launchFB({required String Url}) async {
-    var url = Uri.parse("https://www.facebook.com/etamilnewslive");
+    var url = Uri.parse(Facebook);
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {

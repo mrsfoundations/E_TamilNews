@@ -47,16 +47,16 @@ Widget articleBoxFeatured(
                 children: <Widget>[
                   Container(
                     child: Html(
-                        data: article.title!.length > 40
+                        data: article.title!.length > 65
                             ? "<h2>" +
-                                article.title.toString().substring(0, 40) +
+                                article.title.toString().substring(0, 65) +
                                 "...</h2>"
                             : "<h2>" + article.title.toString() + "</h2>",
                         style: {
                           "h2": Style(
                               color: Theme.of(context).primaryColorDark,
-                              fontWeight: FontWeight.w500,
-                              fontSize: FontSize.em(1.05),
+                              fontWeight:FontWeight.w900,
+                              fontSize: FontSize.percent(95),
                               padding: EdgeInsets.all(2),
                               ),
                         }),
@@ -68,19 +68,19 @@ Widget articleBoxFeatured(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Padding(
-                          padding: EdgeInsets.fromLTRB(5, 2, 8, 4),
+                          padding: EdgeInsets.fromLTRB(10, 2, 8, 4),
                           child: Container(
                             decoration: BoxDecoration(
                                 color: Color(0xFFE3E3E3),
                                 borderRadius: BorderRadius.circular(3)),
-                            padding: EdgeInsets.fromLTRB(1, 4, 4, 1),
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 8),
+                            padding: EdgeInsets.fromLTRB(3, 4, 4, 1),
+                            margin: EdgeInsets.fromLTRB(2, 0, 0, 8),
                             child: Text(
                               article.category.toString(),
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 8,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w700),
                             ),
                           ),
                         ),
@@ -94,7 +94,7 @@ Widget articleBoxFeatured(
           ),
         ),
         Padding(
-          padding: EdgeInsets.fromLTRB(100, 173, 0,0),
+          padding: EdgeInsets.fromLTRB(125, 143, 0,0),
           child: Container(
             child: Row(
               children: <Widget>[
@@ -110,19 +110,28 @@ Widget articleBoxFeatured(
                   article.date.toString(),
                   style: Theme.of(context).textTheme.caption,
                 ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(55, 0,0,0),
+                  child: IconButton(
+                    icon: Icon(Icons.share, color: Colors.black45, size: 20.0),
+                    onPressed: () {
+                      Share.share(article.link.toString());
+                    },
+                  ),
+                ),
               ],
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(280, 150, 0, 0),
-          child: IconButton(
-            icon: Icon(Icons.share, color: Colors.black45, size: 25.0),
-            onPressed: () {
-              Share.share(article.link.toString());
-            },
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.fromLTRB(280, 150, 0, 0),
+        //   child: IconButton(
+        //     icon: Icon(Icons.share, color: Colors.black45, size: 25.0),
+        //     onPressed: () {
+        //       Share.share(article.link.toString());
+        //     },
+        //   ),
+        // ),
   //       article.video != ""
   //           ? Positioned(
   //               left: 18,
